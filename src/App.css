@@ -1,0 +1,206 @@
+.calendar {
+  width: 800px;
+  height: 420px;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #000000;
+}
+
+.calendar__day {
+  width: 110px;
+  float: left;
+}
+
+.calendar__times {
+  width: 30px;
+  float: left;
+  background-color: #0b44a8;
+}
+
+.calendar__half-hour-block {
+  height: 20px;
+  border: 0.5px solid #6fa1f6;
+}
+
+.calendar__half-hour-block:first-child {
+  border-top: none;
+}
+
+.calendar__day:first-of-type .calendar__half-hour-block {
+  border-left: none;
+}
+
+.calendar__half-hour-block:nth-child(4n),
+.calendar__half-hour-block:nth-child(4n-1) {
+  background-color: #d1e1fc;
+}
+
+.calendar__half-hour-block:nth-child(4n-1),
+.calendar__half-hour-block:nth-child(4n-3) {
+  border-bottom: none;
+}
+
+.calendar__half-hour-block:nth-child(4n-2),
+.calendar__half-hour-block:nth-child(4n-3) {
+  background-color: #fff;
+}
+
+.calendar__day-label-row {
+  height: 20px;
+}
+
+.calendar__day-label {
+  color: white;
+  width: 110px;
+  height: 100%;
+  float: left;
+  border: 1px solid #fff;
+}
+
+.calendar__day-label:nth-child(3n) {
+  background-color: #6fa1f6;
+}
+
+.calendar__day-label:nth-child(3n-1) {
+  background-color: #3f81f3;
+}
+
+.calendar__day-label:nth-child(3n-2) {
+  background-color: #0f62f0;
+}
+
+.calendar__day-label-text {
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+
+.calendar__day-label-text span {
+  transform: translateX(-50%) translateY(-50%);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+}
+
+.calendar__day-label--placeholder {
+  width: 30px;
+  height: 100%;
+  float: left;
+  background-color: #0b44a8;
+  color: white;
+  border: 1px solid #fff;
+}
+
+.calendar__day-label--placeholder-text {
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+
+.calendar__day-label--placeholder-text span {
+  transform: translateX(-50%) translateY(-50%);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+}
+
+.calendar__content-container {
+  float: left;
+}
+
+.calendar__content {
+  position: relative;
+}
+
+.calendar__meeting {
+  position: absolute;
+  width: 90px;
+  background-color: #a8e54e;
+  box-shadow: 0 2px 5px rgba(16, 16, 16, 0.5);
+  overflow: hidden;
+  font-size: 8px;
+}
+
+.calendar__meeting-content {
+  position: relative;
+}
+
+.calendar__time-label {
+  height: 40px;
+  color: white;
+  position: relative;
+  border: 1px solid #fff;
+}
+
+.calendar__meeting-remove {
+  position: absolute;
+  top: 3px;
+  right: 2px;
+  cursor: pointer;
+}
+
+.calendar__meeting-edit,
+.calendar__meeting-save {
+  position: absolute;
+  top: 3px;
+  right: 15px;
+  cursor: pointer;
+}
+
+.calendar__time-label .calendar__time-label-text {
+  transform: translateX(-50%) translateY(-50%) rotate(-90deg);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+}
+
+.calendar__meeting-title {
+  margin-left: 5px;
+  margin-top: 2px;
+  width: 55px;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  padding: none;
+  background-color: transparent;
+  resize: none;
+  overflow: hidden;
+  cursor: inherit;
+}
+
+.calendar__meeting-title:focus {
+  outline: none;
+  cursor: text;
+  border-bottom: 1px solid black;
+}
+
+.calendar__meeting-title:disabled {
+  color: black;
+}
+
+.calendar__meeting--grabbable {
+  cursor: grab;
+}
+
+.calendar__meeting--grabbing {
+  cursor: grabbing;
+}
+
+.visually-hidden {
+  border: 0 !important;
+  clip: rect(0 0 0 0) !important;
+  height: 1px !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  position: absolute !important;
+  width: 1px !important;
+}
+
+.react-draggable {
+  cursor: grab;
+}
+
+.react-draggable-dragging {
+  cursor: grabbing;
+}
