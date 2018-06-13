@@ -1,6 +1,6 @@
 # Calendar widget
 
-###General appearance
+### General appearance
 **Behavior**
 - Aesthetic designed to look like example
 
