@@ -44,7 +44,13 @@ class MeetingContent extends React.Component {
   }
 
   render() {
-    const { name, isEditingName, handleStartEditing, handleSave } = this.props;
+    const {
+      name,
+      isEditingName,
+      handleStartEditing,
+      handleSave,
+      width
+    } = this.props;
 
     return (
       <div className="calendar__meeting-content">
@@ -58,6 +64,9 @@ class MeetingContent extends React.Component {
           onChange={this.handleEditName}
           disabled={!isEditingName}
           onKeyPress={this.handleKeyPress}
+          style={{
+            width: width - 35
+          }}
         />
         {isEditingName ? (
           <Check onClick={handleSave} className="calendar__meeting-save" />

@@ -1,17 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import {
-  editMeetingLength,
-  removeMeeting,
-  setMeetingNotNew,
-  editMeetingName,
-  editMeetingTime,
-  editMeetingDay
-} from '../actions/MeetingsActions';
+import { editMeetingTime, editMeetingDay } from '../actions/MeetingsActions';
 import { TIME_BLOCKS, DAYS_OF_THE_WEEK } from '../constants/constants';
 import Draggable from 'react-draggable';
 import MeetingCreator from './MeetingCreator';
 import MeetingContent from './MeetingContent';
+import { meetingOverlapsSelector } from '../selectors/MeetingsSelectors';
 
 class Meeting extends React.Component {
   constructor(props) {
@@ -20,12 +14,14 @@ class Meeting extends React.Component {
 
     this.state = {
       isChangingLength: isNew,
-      isEditingName: false
+      isEditingName: false,
+      isDragging: false
     };
 
     this.handleSave = this.handleSave.bind(this);
     this.handleStartEditing = this.handleStartEditing.bind(this);
     this.handleDragStop = this.handleDragStop.bind(this);
+    this.handleDragStart = this.handleDragStart.bind(this);
   }
 
   handleStartEditing() {
@@ -45,13 +41,29 @@ class Meeting extends React.Component {
 
   getHeight() {
     const { length } = this.props;
+
     return length * 20 - 2;
   }
 
-  getCoordinates() {
-    const { day, time } = this.props;
+  getWidth() {
+    const { meetingOverlaps } = this.props;
+    const { isDragging } = this.state;
 
-    const left = day.index * 110 + 1;
+    if (isDragging) {
+      return 150;
+    }
+
+    return 150 / meetingOverlaps.length;
+  }
+
+  getCoordinates() {
+    const { day, time, meetingOverlaps, index } = this.props;
+    const { isDragging } = this.state;
+
+    const order = meetingOverlaps.sort().indexOf(index);
+
+    const left =
+      day.index * 170 + 1 + (isDragging ? 0 : order * this.getWidth());
     const top = time.index * 20 + 1;
 
     return {
@@ -80,7 +92,7 @@ class Meeting extends React.Component {
         0.5 -
         data.node.offsetParent.offsetLeft -
         prevCoordinates.x) /
-        110
+        170
     );
 
     if (yDiff !== 0) {
@@ -90,6 +102,16 @@ class Meeting extends React.Component {
     if (xDiff !== 0) {
       dispatchEditMeetingDay(index, DAYS_OF_THE_WEEK[day.index + xDiff]);
     }
+
+    this.setState({
+      isDragging: false
+    });
+  }
+
+  handleDragStart() {
+    this.setState({
+      isDragging: true
+    });
   }
 
   render() {
@@ -103,10 +125,9 @@ class Meeting extends React.Component {
           style={{
             left: this.getCoordinates().x,
             top: this.getCoordinates().y,
-            width: 90
+            width: this.getWidth()
           }}
           index={index}
-          onDragEnd={this.handleFinishCreate}
           handleStartEditing={this.handleStartEditing}
         />
       );
@@ -114,19 +135,22 @@ class Meeting extends React.Component {
 
     return (
       <Draggable
-        grid={[110, 20]}
+        grid={[170, 20]}
         onStop={this.handleDragStop}
-        defaultPosition={this.getCoordinates()}
+        onStart={this.handleDragStart}
+        position={this.getCoordinates()}
       >
         <div
           style={{
-            height: this.getHeight()
+            height: this.getHeight(),
+            width: this.getWidth()
           }}
           className="calendar__meeting"
         >
           <MeetingContent
             name={name}
             index={index}
+            width={this.getWidth()}
             isEditingName={isEditingName}
             handleStartEditing={this.handleStartEditing}
             handleSave={this.handleSave}
@@ -140,12 +164,18 @@ class Meeting extends React.Component {
   }
 }
 
+const mapStateToProps = (state, { index }) => {
+  return {
+    meetingOverlaps: meetingOverlapsSelector(state, index)
+  };
+};
+
 const mapDispatchToProps = {
   dispatchEditMeetingTime: editMeetingTime,
   dispatchEditMeetingDay: editMeetingDay
 };
 
 export default connect(
-  undefined,
+  mapStateToProps,
   mapDispatchToProps
 )(Meeting);
