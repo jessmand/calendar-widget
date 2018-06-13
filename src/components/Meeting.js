@@ -139,6 +139,8 @@ class Meeting extends React.Component {
         onStop={this.handleDragStop}
         onStart={this.handleDragStart}
         position={this.getCoordinates()}
+        enableUserSelectHack={true}
+        cancel=".calendar__meeting-title:not(:disabled), .calendar__meeting-remove, .calendar__meeting-edit, .calendar__meeting-save"
       >
         <div
           style={{
