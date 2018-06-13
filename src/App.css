@@ -204,3 +204,12 @@
 .react-draggable-dragging {
   cursor: grabbing;
 }
+
+.react-resizable-handle {
+  position: absolute;
+  width: 90px;
+  height: 5px;
+  bottom: 0;
+  left: 0;
+  cursor: s-resize;
+}

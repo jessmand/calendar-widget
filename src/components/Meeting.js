@@ -8,12 +8,10 @@ import {
   editMeetingTime,
   editMeetingDay
 } from '../actions/MeetingsActions';
-import Pencil from 'react-icons/lib/go/pencil';
-import X from 'react-icons/lib/go/x';
-import Check from 'react-icons/lib/go/check';
-import Textarea from 'react-textarea-autosize';
 import { TIME_BLOCKS, DAYS_OF_THE_WEEK } from '../constants/constants';
 import Draggable from 'react-draggable';
+import MeetingCreator from './MeetingCreator';
+import MeetingContent from './MeetingContent';
 
 class Meeting extends React.Component {
   constructor(props) {
@@ -25,78 +23,9 @@ class Meeting extends React.Component {
       isEditingName: false
     };
 
-    this.handleMouseLeave = this.handleMouseLeave.bind(this);
-    this.handleMouseUp = this.handleMouseUp.bind(this);
-    this.handleMouseMove = this.handleMouseMove.bind(this);
-    this.handleRemove = this.handleRemove.bind(this);
-    this.handleEditName = this.handleEditName.bind(this);
     this.handleSave = this.handleSave.bind(this);
     this.handleStartEditing = this.handleStartEditing.bind(this);
-    this.handleKeyPress = this.handleKeyPress.bind(this);
     this.handleDragStop = this.handleDragStop.bind(this);
-  }
-
-  handleMouseLeave(e) {
-    const { isChangingLength } = this.state;
-    const { dispatchEditMeetingLength, index, length } = this.props;
-
-    if (isChangingLength) {
-      const meetingTop = e.target.offsetParent.offsetTop + e.target.offsetTop;
-      const mouseY = e.clientY;
-      const meetingHeight = e.target.offsetHeight;
-
-      if (mouseY >= meetingTop + meetingHeight) {
-        dispatchEditMeetingLength(index, length + 1);
-      }
-    }
-  }
-
-  // TODO: attach a mouseup handler to the window
-  // so that drag also stops onMouseUp outside
-  // of meeting element
-  handleMouseUp() {
-    const { isNew, index, dispatchSetMeetingNotNew } = this.props;
-
-    console.log('mouse up');
-
-    this.setState({
-      isChangingLength: false
-    });
-
-    if (isNew) {
-      dispatchSetMeetingNotNew(index);
-      this.handleStartEditing();
-    }
-  }
-
-  handleMouseMove(e) {
-    const { isChangingLength } = this.state;
-    const { dispatchEditMeetingLength, index, length } = this.props;
-
-    if (!isChangingLength) return;
-    const meetingTop = e.target.offsetParent.offsetTop + e.target.offsetTop;
-    const mouseY = e.clientY;
-    const meetingHeight = e.target.offsetHeight;
-
-    if (mouseY <= meetingTop + meetingHeight - 20) {
-      dispatchEditMeetingLength(index, length - 1);
-    }
-  }
-
-  handleRemove() {
-    const { index, dispatchRemoveMeeting } = this.props;
-
-    dispatchRemoveMeeting(index);
-  }
-
-  handleNameFocus(e) {
-    e.target.select();
-  }
-
-  handleEditName(e) {
-    const { dispatchEditMeetingName, index } = this.props;
-
-    dispatchEditMeetingName(index, e.target.value);
   }
 
   handleStartEditing() {
@@ -104,7 +33,7 @@ class Meeting extends React.Component {
       {
         isEditingName: true
       },
-      () => this.nameInput.focus()
+      this.meetingContent.getWrappedInstance().focusOnName
     );
   }
 
@@ -112,12 +41,6 @@ class Meeting extends React.Component {
     this.setState({
       isEditingName: false
     });
-  }
-
-  handleKeyPress(e) {
-    if (e.key === 'Enter') {
-      this.handleSave();
-    }
   }
 
   getHeight() {
@@ -170,38 +93,24 @@ class Meeting extends React.Component {
   }
 
   render() {
-    const { isNew, name } = this.props;
+    const { isNew, name, index } = this.props;
     const { isEditingName } = this.state;
 
     if (isNew) {
       return (
-        <div
-          onMouseLeave={this.handleMouseLeave}
-          onMouseMove={this.handleMouseMove}
-          onMouseDown={this.handleMouseDown}
-          onMouseUp={this.handleMouseUp}
+        <MeetingCreator
+          height={this.getHeight()}
           style={{
-            height: this.getHeight(),
             left: this.getCoordinates().x,
-            top: this.getCoordinates().y
+            top: this.getCoordinates().y,
+            width: 90
           }}
-          className="calendar__meeting"
-        >
-          <div className="calendar__meeting-content">
-            <X className="calendar__meeting-remove" />
-          </div>
-        </div>
+          index={index}
+          onDragEnd={this.handleFinishCreate}
+          handleStartEditing={this.handleStartEditing}
+        />
       );
     }
-
-    const editButton = isEditingName ? (
-      <Check onClick={this.handleSave} className="calendar__meeting-save" />
-    ) : (
-      <Pencil
-        onClick={this.handleStartEditing}
-        className="calendar__meeting-edit"
-      />
-    );
 
     return (
       <Draggable
@@ -215,24 +124,16 @@ class Meeting extends React.Component {
           }}
           className="calendar__meeting"
         >
-          <div className="calendar__meeting-content">
-            <Textarea
-              className="calendar__meeting-title"
-              inputRef={input => {
-                this.nameInput = input;
-              }}
-              onFocus={this.handleNameFocus}
-              value={name}
-              onChange={this.handleEditName}
-              disabled={!isEditingName}
-              onKeyPress={this.handleKeyPress}
-            />
-            {isNew ? null : editButton}
-            <X
-              onClick={this.handleRemove}
-              className="calendar__meeting-remove"
-            />
-          </div>
+          <MeetingContent
+            name={name}
+            index={index}
+            isEditingName={isEditingName}
+            handleStartEditing={this.handleStartEditing}
+            handleSave={this.handleSave}
+            ref={meetingContent => {
+              this.meetingContent = meetingContent;
+            }}
+          />
         </div>
       </Draggable>
     );
@@ -240,10 +141,6 @@ class Meeting extends React.Component {
 }
 
 const mapDispatchToProps = {
-  dispatchEditMeetingLength: editMeetingLength,
-  dispatchRemoveMeeting: removeMeeting,
-  dispatchSetMeetingNotNew: setMeetingNotNew,
-  dispatchEditMeetingName: editMeetingName,
   dispatchEditMeetingTime: editMeetingTime,
   dispatchEditMeetingDay: editMeetingDay
 };
